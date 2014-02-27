@@ -40,6 +40,7 @@ int main()
 		cin >> ans;
 	} while (ans == 'y' || ans == 'Y');
 
+
 	cout << "That's it from your 24-hour weather program.\n";
 	return 0;
 }
