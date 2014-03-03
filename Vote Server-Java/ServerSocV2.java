@@ -10,7 +10,8 @@ class Lists
 	public static String [] votes = new String[5]; //Current Vote Options
 	public static int voteCast = 0; //Number of votes cast
 	public static int clientNum = 0;
-
+	public static int firstcount=0;
+	public static int [] choice = new int [5];
 }
 
 //Main Class----------------------------------------------------------------------------
@@ -112,15 +113,18 @@ class ClientHandler extends Thread
 			for(int i=0;i<5;i++)
 			{
 	           	out.writeUTF(Lists.votes[i]);
+	           	System.out.println(Lists.votes[i]);
           	}
 
 		  	//Get vote option
 			DataInputStream in = new DataInputStream(socket.getInputStream());
 			String song=""+in.readUTF();
-			for(int i=0;i<Lists.tracks.length;i++)
-			{		
-				if(song.equals(Lists.tracks[i]))
-				song = Lists.songs[i];
+			
+			
+			for(int i=0;i<5;i++)
+			{
+				if(song.equals(Lists.votes[i]))
+					Lists.choice[i]++;
 			}
 
 			Lists.voteCast = Lists.voteCast + 1; //Inc VoteCast
@@ -130,10 +134,51 @@ class ClientHandler extends Thread
 
 			System.out.println(song); //Print Vote
 			while(Lists.voteCast != Lists.clientNum)
-			{System.out.print(1);}
-		try
-		{
-			this.sleep(10000);
+			{}
+			try
+			{
+
+			//////waiting time for voting between songs
+			if(Lists.firstcount==0)
+			{
+				int finalchoice = 0;
+				for(int i = 1; i<5; i++)
+				{
+					if(Lists.choice[i]>Lists.choice[finalchoice])
+						finalchoice=i;
+				}
+			
+
+				for(int i=0;i<Lists.tracks.length;i++)
+				{		
+					if(Lists.votes[finalchoice].equals(Lists.tracks[i]))
+					{
+						song = Lists.songs[i];
+					}
+				}
+			Process proc = Runtime.getRuntime().exec("C:\\Program Files (x86)\\foobar2000\\foobar2000.exe  C:\\Users\\Luke\\Desktop\\music\\"+song);
+			Lists.firstcount++;
+			}
+			else
+			{
+				int finalchoice = 0;
+				for(int i = 1; i<5; i++)
+				{
+					if(Lists.choice[i]>Lists.choice[finalchoice])
+						finalchoice=i;
+				}
+				for(int i=0;i<Lists.tracks.length;i++)
+				{		
+					if(Lists.votes[finalchoice].equals(Lists.tracks[i]))
+					{
+						song = Lists.songs[i];
+					}
+				}
+
+				Process proc = Runtime.getRuntime().exec("C:\\Program Files (x86)\\foobar2000\\foobar2000.exe /add  C:\\Users\\Luke\\Desktop\\music\\"+song);
+			}
+
+			this.sleep(120000);
 		}
 		catch (Throwable e) 
 		{
@@ -151,7 +196,7 @@ class ClientHandler extends Thread
 
 		}
 		
-			socket.close();
+			
 		}
 		catch (IOException e) 
 		{
